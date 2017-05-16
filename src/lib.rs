@@ -1,11 +1,11 @@
 #[derive(Eq,PartialEq,Debug)]
-enum Command {
+pub enum Command {
     Publish(String),
     Retrieve,
 }
 
 #[derive(Eq,PartialEq,Debug)]
-enum Error {
+pub enum Error {
     UnknownVerb,
     UnexpectedPayload,
     MissingPayload,
@@ -13,7 +13,7 @@ enum Error {
     IncompleteMessage,
 }
 
-fn parse(input: &str) -> Result<Command, Error> {
+pub fn parse(input: &str) -> Result<Command, Error> {
     let mut input = input;
     if let Some(pos) = input.find("\n") {
         input = &input[0..pos];
@@ -43,39 +43,4 @@ fn parse(input: &str) -> Result<Command, Error> {
     } else {
         Err(Error::EmptyMessage)
     }
-}
-
-#[test]
-fn test_publish() {
-    let line = "PUBLISH TestMessage\n";
-    let result = parse(line);
-    assert_eq!(result, Ok(Command::Publish("TestMessage".into())));
-}
-
-#[test]
-fn test_empty_string() {
-    let line = "";
-    let result = parse(line);
-    assert_eq!(result, Err(Error::IncompleteMessage));
-}
-
-#[test]
-fn test_missing_newline() {
-    let line = "FooBar";
-    let result = parse(line);
-    assert_eq!(result, Err(Error::IncompleteMessage));
-}
-
-#[test]
-fn test_retrieve_with_payload() {
-    let line = "RETRIEVE payload\n";
-    let result = parse(line);
-    assert_eq!(result, Err(Error::UnexpectedPayload));
-}
-
-#[test]
-fn test_publish_without_payload() {
-    let line = "PUBLISH\n";
-    let result = parse(line);
-    assert_eq!(result, Err(Error::MissingPayload));
 }
